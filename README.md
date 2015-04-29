@@ -86,13 +86,15 @@ Calculator.formula = function() {
 	var x = (new Operand(x1)).add(23).add("field3");
 	
 	// произведение
-	Operand.multymany([x2, 45, "field4"]);
+	var x = Operand.multymany([x2, 45, "field4"]);
 	// равносильно
 	var x = (new Operand(x2)).multy(45).multy("field4");
 }
 ```
 
 ###Правила
+
+...несколько слов о правилах...
 
 ###Ключевые слова
 
