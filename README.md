@@ -98,7 +98,7 @@ Calculator.formula = function() {
 
 Например:
 ```javascript
-Calendar.rules["field1"] = function(value) {
+Calculator.rules["field1"] = function(value) {
 	return (value >= 10) ? 10 : value;
 }
 
@@ -112,11 +112,11 @@ var x = (new Operand("field1")).value; // x = 10
 
 Например:
 ```javascript
-Calendar.rules["field1"] = function(value) {
+Calculator.rules["field1"] = function(value) {
 	// rule1
 }
 
-Calendar.rules["field1"] = function(value) {
+Calculator.rules["field1"] = function(value) {
 	// rule2
 }
 ```
@@ -125,7 +125,25 @@ Calendar.rules["field1"] = function(value) {
 В правилах можно использовать значения других полей. Например, в книжнем магазине, при покупке свыше 5 книг клиент получает скидку 20%, а при покупке 10 книг - 50%. Данное условие можно реализовать с помощью правила:
 
 ```javascript
+//
+// имеем два поля: "count" - число книг и "cost" - цена за 1 книгу
+//
+Calculator.formula = function() {
+	// return new Operand("cost").multy("count");
+	return Operand.multymany(["cost", "count"]);
+}
 
+Calculator.rules["cost"] = function(value) {
+	var count = this.fields["count"];
+	var k = 1.0;
+	if (count >= 5) {
+		k = 0.8;
+	}
+	if (count >= 10) {
+		k = 0.5;
+	}
+	return value * k;
+}
 ```
 
 ###Ключевые слова
