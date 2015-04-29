@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="calculator.js"></script>
+    </head>
+    <body>
+        <form class="calculator" data-calc="MAIN">
+            <div>
+                <label for="width">Ширина</label>
+                <input id="width" type="text" data-calc="width" value="0" />
+            </div>
+            <div>
+                <label for="length">Длина</label>
+                <input id="length" type="text" data-calc="len" value="0" />
+            </div>
+            <div>
+                <label for="curnises">Число карнизов</label>
+                <input id="curnises" type="text" data-calc="curs" value="1" />
+            </div>
+            <div>
+                <label for="color">Цвет</label>
+                <select id="color" data-calc="color">
+                    <option value="150">Красный</option>
+                    <option value="100">Белый</option>
+                    <option value="200">Синий</option>
+                </select>
+            </div>
+            <div>
+                <b><span data-calc="OUTPUT">0</span> рублей</b>
+            </div>
+            <div>
+                <input type="button" value="Вычислить" onclick="Calculator.exec()" />
+            </div>
+        </form>
+        <script>
+            (function(){
+                //
+                // ФОРМУЛА
+                //
+                Calculator.formula = function() {
+                    // Данная запись равносильная выражению: color * (width * len * 2) + curs
+                    var p = Operand.manymulty(["width", "len", 2]);
+                    return new Operand("color").multy(p).add("curs");
+                };
+                //
+                // ПРАВИЛА
+                //
+                Calculator.rules["curs"] = function(value) {
+                    var cost = 50;
+                    if (value >= 10) {
+                        cost = 30;
+                    }
+                    return value * cost;
+                };
+            })();
+        </script>
+    </body>
+</html>
