@@ -91,6 +91,8 @@ Calculator.formula = function() {
 	var x = (new Operand(x2)).multy(45).multy("field4");
 	
 	//
+	// КАК СЕЙЧАС
+	//
 	// Куб суммы: a^3 + 3*(a^2)*b + 3*a*(b^2) + b^3
 	//
 	Operand.multymany([
@@ -106,6 +108,20 @@ Calculator.formula = function() {
 			(new Operand("b")).pow(2),
 		]),
 		(new Operand("b")).pow(3),
+	]);
+	
+	//
+	// КАК ВАРИАНТ (PROLOG FOREVER!!!)
+	//
+	// Куб суммы: a^3 + 3*(a^2)*b + 3*a*(b^2) + b^3
+	//
+	var a = new Operand("a");
+	var b = new Operand("b");
+	Operand.multymany([
+		a.pow(3),
+		Operand.multymany([a.pow(2), 3, b]),
+		Operand.multymany([b.pow(2), 3, a]),
+		b.pow(3)
 	]);
 }
 ```
@@ -192,4 +208,4 @@ function op(val) {
 
 ###Более сокращенный вариант выполнения операций
 
-- **!!!** Сделать переменные константами (закос под функциональность)
+- **!!!** Сделать переменные константами (закос под функциональность) - но тут сразу минус в плане памяти, надо сделать BRANCHMARKs
