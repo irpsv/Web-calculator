@@ -39,7 +39,7 @@ Calculator.exec = function() {
     this.initFields();
     this.checkRules();
     this.printOutput(
-        this.formula().value
+        this.formula().val()
     );
     this.afterExec();
 };
@@ -114,14 +114,14 @@ function op(value) {
  * @param {Number|String|Operand} input_value числовое значение, или же имя атрибута калькулятора
  */
 function Operand(input_value) {
-    this.getValue = function(val) {
+    this.parseValue = function(value) {
         // если Operand
-        if (val.value !== undefined) {
-            return val.value;
+        if (value.val !== undefined) {
+            return value.val();
         }
         // если String
-        else if (isNaN(val)) {
-            var tmp = Calculator.fields[val];
+        else if (isNaN(value)) {
+            var tmp = Calculator.fields[value];
             if (tmp === null) {
                 throw new Error("Input value invalid");
             }
@@ -129,10 +129,14 @@ function Operand(input_value) {
         }
         // если Number
         else {
-            return val;
+            return value;
         }
     };
-    this.value = this.getValue(input_value);
+    //
+    var __value = this.parseValue(input_value);
+    this.val = function() {
+        return __value;
+    }
 }
 
 /**
@@ -140,23 +144,23 @@ function Operand(input_value) {
  */
 
 Operand.prototype.add = function(value) {
-    return op(this.value + this.getValue(value));
+    return op(this.val() + this.parseValue(value));
 }
 
 Operand.prototype.sub = function(value) {
-    return op(this.value - this.getValue(value));
+    return op(this.val() - this.parseValue(value));
 }
 
 Operand.prototype.multy = function(value) {
-    return op(this.value * this.getValue(value));
+    return op(this.val() * this.parseValue(value));
 }
 
 Operand.prototype.div = function(value) {
-    return op(this.value / this.getValue(value));
+    return op(this.val() / this.parseValue(value));
 }
 
 Operand.prototype.pow = function(value) {
-    return op(Math.pow(this.value, this.getValue(value)));
+    return op(Math.pow(this.val(), this.parseValue(value)));
 }
 
 /**
