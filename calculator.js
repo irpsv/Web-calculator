@@ -11,6 +11,7 @@ Calculator.output = null;
 
 /**
  * Список правил для полей калькулятора
+ * @type {Object}
  */
 Calculator.rules = {};
 
@@ -18,6 +19,11 @@ Calculator.rules = {};
  * Список полей калькулятора
  */
 Calculator.fields = [];
+
+/**
+ * Функция которая вызывается после проведения вычислений
+ */
+Calculator.afterExec = function() {};
 
 /**
  * По умолчанию формула возвращает 0
@@ -35,6 +41,7 @@ Calculator.exec = function() {
     this.printOutput(
         this.formula().value
     );
+    this.afterExec();
 };
 
 /**
@@ -95,6 +102,14 @@ Calculator.checkRules = function() {
 };
 
 /**
+ * Мини-конструктор
+ * @returns {Operand}
+ */
+function op(value) {
+    return new Operand(value);
+}
+
+/**
  * Объект представляющий операнда калькулятора
  * @param {Number|String|Operand} input_value числовое значение, или же имя атрибута калькулятора
  */
@@ -125,28 +140,23 @@ function Operand(input_value) {
  */
 
 Operand.prototype.add = function(value) {
-    this.value += this.getValue(value);
-    return this;
+    return op(this.value + this.getValue(value));
 }
 
 Operand.prototype.sub = function(value) {
-    this.value -= this.getValue(value);
-    return this;
+    return op(this.value - this.getValue(value));
 }
 
 Operand.prototype.multy = function(value) {
-    this.value *= this.getValue(value);
-    return this;
+    return op(this.value * this.getValue(value));
 }
 
 Operand.prototype.div = function(value) {
-    this.value /= this.getValue(value);
-    return this;
+    return op(this.value / this.getValue(value));
 }
 
 Operand.prototype.pow = function(value) {
-    this.value = Math.pow(this.value, this.getValue(value));
-    return this;
+    return op(Math.pow(this.value, this.getValue(value)));
 }
 
 /**
@@ -156,7 +166,7 @@ Operand.prototype.pow = function(value) {
 Operand.sum = function(values) {
     var result = new Operand(0);
     for (var i = 0; i < values.length; i++) {
-        result.add(values[i]);
+        result = result.add(values[i]);
     }
     return result;
 }
@@ -164,7 +174,7 @@ Operand.sum = function(values) {
 Operand.multymany = function (values) {
     var result = new Operand(1);
     for (var i = 0; i < values.length; i++) {
-        result.multy(values[i]);
+        result = result.multy(values[i]);
     }
     return result;
 }

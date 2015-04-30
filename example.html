@@ -5,31 +5,146 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="calculator.js"></script>
+        <style>
+            body {
+                background: #eeeeee;
+            }
+            
+            .calculator {
+                width: 845px;
+                margin: auto;
+            }
+            
+            .calculator * {
+                font-family: Arial;
+                font-size: 14pt;
+                outline: none;
+            }
+            
+            .calculator > div {
+                display: inline-block;
+                width: 400px;
+                text-align: right;
+                padding: 10px;
+            }
+            
+            .calculator label {
+                font-weight: bold;
+                text-align: right;
+                color: #274b87;
+            }
+            
+            .calculator input[type=text],
+            .calculator select {
+                padding: 5px;
+                text-align: center;
+                width: 150px;
+                border: 1px solid silver;
+            }
+            
+            .calculator select {
+                width: 162px;
+            }
+            
+            .calculator input[type=text]:focus,
+            .calculator select:focus {
+                border: 1px solid #274b87;
+            }
+            
+            .calculator input[type=button] {
+                min-width: 150px;
+                background: #c9c9c9;
+                border: 1px solid #a4a4a4;
+                color: #777777;
+                padding: 5px;
+                text-align: center;
+                cursor: pointer;
+            }
+            
+            .calculator input[type=button]:hover {
+                color: white;
+                background: #274b87;
+                border-color: #274b87;
+            }
+            
+            .cost {
+                color: green;
+            }
+            
+            .discount {
+                color: red;
+            }
+        </style>
     </head>
     <body>
+        <h1>Натяжные потолки</h1>
         <form class="calculator" data-calc="MAIN">
-            <div>
-                <label for="width">Ширина</label>
-                <input id="width" type="text" data-calc="width" value="0" />
-            </div>
-            <div>
-                <label for="length">Длина</label>
-                <input id="length" type="text" data-calc="len" value="0" />
-            </div>
-            <div>
-                <label for="curnises">Число карнизов</label>
-                <input id="curnises" type="text" data-calc="curs" value="1" />
-            </div>
             <div>
                 <label for="color">Цвет</label>
                 <select id="color" data-calc="color">
-                    <option value="150">Красный</option>
-                    <option value="100">Белый</option>
-                    <option value="200">Синий</option>
+                    <option value="350">Цветной</option>
+                    <option value="300">Белый</option>
                 </select>
             </div>
             <div>
-                <b><span data-calc="OUTPUT">0</span> рублей</b>
+                <label for="fact">Фактура</label>
+                <select id="fact">
+                    <option>Глянцевая</option>
+                    <option>Сатиновая</option>
+                    <option>Матовая</option>
+                </select>
+            </div>
+            <div>
+                <label for="vend">Производитель</label>
+                <select id="vend">
+                    <option>Бельгия</option>
+                    <option>Германия</option>
+                    <option>Франция</option>
+                </select>
+            </div>
+            <div>
+                <label for="width">Ширина потолка (м)</label>
+                <input id="width" type="text" data-calc="width" value="0" />
+            </div>
+            <div>
+                <label for="length">Длина потолка (м)</label>
+                <input id="length" type="text" data-calc="len" value="0" />
+            </div>
+            <div>
+                <label for="curnises">Карниз (м)</label>
+                <input id="curnises" type="text" data-calc="curs" value="0" />
+            </div>
+            <div>
+                <label for="curnises">Углы (шт)</label>
+                <input id="curnises" type="text" data-calc="agle" value="0" />
+            </div>
+            <div>
+                <label for="curnises">Трубы (шт)</label>
+                <input id="curnises" type="text" data-calc="tub" value="0" />
+            </div>
+            <div>
+                <label for="curnises">Люстры (шт)</label>
+                <input id="curnises" type="text" data-calc="lus" value="0" />
+            </div>
+            <div>
+                <label for="curnises">Светильники (шт)</label>
+                <input id="curnises" type="text" data-calc="svet" value="0" />
+            </div>
+            <div>
+                <label for="curnises">Плинтус (м)</label>
+                <input id="curnises" type="text" data-calc="pl" value="0" />
+            </div>
+            <div>
+                <!-- пустой блок -->
+            </div>
+            <div>
+                <span class="cost">
+                    Цена <b><span data-calc="OUTPUT">0</span></b> рублей
+                </span>
+                /
+                <span class="discount">
+                    Скидка <b><span id="discount">0</span></b> рублей
+                </span>
             </div>
             <div>
                 <input type="button" value="Вычислить" onclick="Calculator.exec()" />
@@ -38,22 +153,53 @@
         <script>
             (function(){
                 //
+                // ГЛОБАЛЬНАЯ ПЕРЕМЕННАЯ
+                //
+                discount = 0;
+                //
                 // ФОРМУЛА
                 //
                 Calculator.formula = function() {
-                    // Данная запись равносильная выражению: color * (width * len * 2) + curs
-                    var p = Operand.manymulty(["width", "len", 2]);
-                    return new Operand("color").multy(p).add("curs");
+                    var p = Operand.multymany(["width","len",2]);
+                    return Operand.sum([
+                        op("agle"),
+                        op("tub"),
+                        op("lus"),
+                        op("svet").multy(200),
+                        op("color").multy(p),
+                        op("curs").multy(p),
+                        op("pl").multy(p),
+                    ]);
+                };
+                //
+                // ОБРАБОТКА ПОСЛЕ ВЫЧИСЛЕНИЙ
+                //
+                Calculator.afterExec = function() {
+                    document.getElementById("discount").innerHTML = discount;
+                    discount = 0;
                 };
                 //
                 // ПРАВИЛА
                 //
-                Calculator.rules["curs"] = function(value) {
-                    var cost = 50;
-                    if (value >= 10) {
-                        cost = 30;
-                    }
-                    return value * cost;
+                
+                /**
+                 * Вычисление скидки
+                 */
+                function rule(value, d_count) {
+                    var cost = 150;
+                    var k = (value >= d_count) ? d_count : value;
+                    discount += cost * k;
+                    return cost * (value - k);
+                }
+                
+                Calculator.rules["agle"] = function(value) {
+                    return rule(value, 4);
+                };
+                Calculator.rules["tub"] = function(value) {
+                    return rule(value, 1);
+                };
+                Calculator.rules["lus"] = function(value) {
+                    return rule(value, 1);
                 };
             })();
         </script>
