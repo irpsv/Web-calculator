@@ -43,8 +43,8 @@
 Например:
 ```javascript
 Calculator.formula = function() {
-	var x = new Operand("field2").sub(123);
-	return new Operand(2).add(3).multy("field1").div(2).sub(x);
+	var x = op("field2").sub(123);
+	return op(2).add(3).multy("field1").div(2).sub(x);
 }
 ```
 Функция должна возвращать элемент типа [Operand](#Операнды), иначе результатом вычисления будет **NaN**.
@@ -65,12 +65,16 @@ var x = op(1);
 - число (Number)
 - имя поля (String)
 
-Объект **Operand** представляет собой **неизменяемый** объект, т.е. значение задается в нем только один раз. Все операции производимые над объектом, пораждают новый объект:
+Объект **Operand** представляет собой **неизменяемый** объект, т.е. значение задается в нем только **один раз** при инциализации. Все операции производимые над объектом, **пораждают новый объект**:
 ```javascript
 var x = op(3);
 var y = x.add(12);
-x.value; // =3
-y.value; // =15
+
+//
+// Получить значение можно с помощью функции val()
+//
+x.val(); // =3
+y.val(); // =15
 ```
 
 Ниже приведен пример с использованием всех доступных операций (никто не мешает добавить своих путем добавления методов к классу **Operand**):
@@ -136,9 +140,9 @@ Calculator.rules["field1"] = function(value) {
 }
 
 // допустим значение поля 'field1' равно '6'
-var x = (new Operand("field1")).value; // x = 6
+var x = op("field1").val(); // x = 6
 // допустим значение поля 'field1' равно '13'
-var x = (new Operand("field1")).value; // x = 10
+var x = op("field1").val(); // x = 10
 ```
 
 Для одного поля можно применять **несколько** правил (смысл этого не понятен, но мало ли), но вызываются они все строго в порядке инициализации.
@@ -162,7 +166,8 @@ Calculator.rules["field1"] = function(value) {
 // имеем два поля: "count" - число книг и "cost" - цена за 1 книгу
 //
 Calculator.formula = function() {
-	// return new Operand("cost").multy("count");
+	return op("cost").multy("count");
+	// равносильно
 	return Operand.multymany(["cost", "count"]);
 }
 
