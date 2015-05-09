@@ -158,6 +158,9 @@ Calculator.formula = function() {
 }
 
 Calculator.rules["cost"] = function(value) {
+	//
+	// Обращение к другому полю производиться через this.fields["имя поля"]
+	//
 	var count = this.fields["count"];
 	var k = 1.0;
 	if (count >= 5) {
