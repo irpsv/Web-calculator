@@ -1,8 +1,18 @@
+function isArray(obj) {
+    return Object.prototype.toString.call(obj) === Object.prototype.toString.call([]);
+}
+
 /**
  * Главный объект калькулятора
  * @type Object
  */
 Calculator = {};
+
+/**
+ * Число знаков после запятой в выводе
+ * @type Number
+ */
+Calculator.fix = 0;
 
 /**
  * Элемент вывода в который будет возвращено значение
@@ -39,7 +49,7 @@ Calculator.exec = function() {
     this.initFields();
     this.checkRules();
     this.printOutput(
-        this.formula().val()
+        this.formula().val().toFixed(this.fix)
     );
     this.afterExec();
 };
@@ -139,46 +149,33 @@ function Operand(input_value) {
     }
 }
 
-/**
- * ОПЕРАЦИИ МЕЖДУ ДВУМЯ ОПЕРАНДАМИ
- */
-
-Operand.prototype.add = function(value) {
-    return op(this.val() + this.parseValue(value));
-}
-
-Operand.prototype.sub = function(value) {
-    return op(this.val() - this.parseValue(value));
-}
-
-Operand.prototype.multy = function(value) {
-    return op(this.val() * this.parseValue(value));
-}
-
-Operand.prototype.div = function(value) {
-    return op(this.val() / this.parseValue(value));
-}
-
-Operand.prototype.pow = function(value) {
-    return op(Math.pow(this.val(), this.parseValue(value)));
-}
-
-/**
- * ОПЕРАЦИИ НАД НЕСКОЛЬКИМИ ОПЕРАНДАМИ
- */
-
-Operand.sum = function(values) {
-    var result = new Operand(0);
-    for (var i = 0; i < values.length; i++) {
-        result = result.add(values[i]);
+Operand.prototype.o = function(operator, args)
+{
+    if (isArray(args)) {
+        var result = op(this.val());
+        for (var i=0; i<args.length; i++) {
+            result = result.calc(operator, args[i]);
+        }
+        return result;
     }
-    return result;
-}
+    return this.calc(operator, args);
+};
 
-Operand.multymany = function (values) {
-    var result = new Operand(1);
-    for (var i = 0; i < values.length; i++) {
-        result = result.multy(values[i]);
+Operand.prototype.calc = function(operator, arg)
+{
+    var value = this.parseValue(arg);
+    switch (operator) {
+        case '+':
+            return op(this.val() + value);
+        case '-':
+            return op(this.val() - value);
+        case '/':
+            return op(this.val() / value);
+        case '*':
+            return op(this.val() * value);
+        case '^':
+            return op(Math.pow(this.val(), value));
+        default:
+            throw new Error("Operator not found");
     }
-    return result;
-}
+};
