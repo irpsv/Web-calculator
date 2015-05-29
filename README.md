@@ -43,8 +43,8 @@
 Например:
 ```javascript
 Calculator.formula = function() {
-	var x = op("field2").sub(123);
-	return op(2).add(3).multy("field1").div(2).sub(x);
+	var x = op("field2").o('-', 123);
+	return op(2).o('+', 3).o('*', "field1").o('/', 2).o('-', x);
 }
 ```
 Функция должна возвращать элемент типа [Operand](#Операнды).
@@ -68,7 +68,7 @@ var x = op(1);
 Объект **Operand** представляет собой **неизменяемый** объект, т.е. значение задается в нем только **один раз** при инциализации. Все операции производимые над объектом, **пораждают новый объект**:
 ```javascript
 var x = op(3);
-var y = x.add(12);
+var y = x.o('+', 12);
 
 //
 // Получить значение можно с помощью функции val()
@@ -89,42 +89,34 @@ Calculator.formula = function() {
 	var x2 = op("field1");
 	var x3 = op(x2); // так тоже можно, но не понятно зачем :-)
 	// сложение
-	x1.add(1);
+	x1.o('+', 1);
 	// вычитание
-	x1.sub(x2);
+	x1.o('-', x2);
 	// умножение
-	x1.multy("field2");
+	x1.o('*', "field2");
 	// деление
-	x2.div(x1);
+	x2.o('/', x1);
 	// возведение в степень
-	x3.pow(x1);
+	x3.o('^', x1);
 	// можно выстраивать цепочки вычислений, выражение ниже равносильно: x1 = x1 * x2 - x3
-	x1 = x1.multy(x2).sub(x3);
+	x1 = x1.o('*', x2).o('+', x3);
 	
 	//
 	// ГРУППОВЫЕ ОПЕРАТОРЫ
+	// Для того чтобы сделать сразу несколько действий, то нужно просто в массиве прописать все операнты
 	//
-	
-	// суммирование
-	var x = Operand.sum([x1, 23, "field3"]);
-	// равносильно
-	var x = op(x1).add(23).add("field3");
-	
-	// произведение
-	var x = Operand.multymany([x2, 45, "field4"]);
-	// равносильно
-	var x = op(x2).multy(45).multy("field4");
+	x1.o('+', [1,2,3,4]);
 	
 	//
 	// Куб суммы: a^3 + 3*(a^2)*b + 3*a*(b^2) + b^3
 	//
 	var a = op("a");
 	var b = op("b");
-	Operand.multymany([
-		a.pow(3),
-		Operand.multymany([a.pow(2), 3, b]),
-		Operand.multymany([b.pow(2), 3, a]),
-		b.pow(3)
+	op(0).o('+', [
+		a.o('^', 3),
+		a.o('^', 2).o('*', 3, b),
+		b.o('^', 2).o('*', 3, a),
+		b.o('^', 3),
 	]);
 }
 ```
@@ -152,9 +144,7 @@ var x = op("field1").val(); // x = 10
 // имеем два поля: "count" - число книг и "cost" - цена за 1 книгу
 //
 Calculator.formula = function() {
-	return op("cost").multy("count");
-	// равносильно
-	return Operand.multymany(["cost", "count"]);
+	return op("cost").o('*', "count");
 }
 
 Calculator.rules["cost"] = function(value) {
