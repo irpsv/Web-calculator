@@ -114,8 +114,8 @@ Calculator.formula = function() {
 	var b = op("b");
 	op(0).o('+', [
 		a.o('^', 3),
-		a.o('^', 2).o('*', 3, b),
-		b.o('^', 2).o('*', 3, a),
+		a.o('^', 2).o('*', [3, b]),
+		b.o('^', 2).o('*', [3, a]),
 		b.o('^', 3),
 	]);
 }
@@ -159,6 +159,9 @@ Calculator.rules["cost"] = function(value) {
 	if (count >= 10) {
 		k = 0.5;
 	}
+	//
+	// value - это значение введеное пользователем
+	//
 	return value * k;
 }
 ```
