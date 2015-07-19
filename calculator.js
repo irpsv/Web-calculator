@@ -15,9 +15,14 @@ Calculator = {};
 Calculator.fix = 0;
 
 /**
- * Элемент вывода в который будет возвращено значение
+ * Тэг формы из которой нужно брать данные
  */
-Calculator.output = null;
+Calculator.id_main_elem = null;
+
+/**
+ * Тэг формы в которую будет выводиться результат
+ */
+Calculator.id_output_elem = null;
 
 /**
  * Список правил для полей калькулятора
@@ -28,7 +33,7 @@ Calculator.rules = {};
 /**
  * Список полей калькулятора
  */
-Calculator.fields = [];
+Calculator.fields = {};
 
 /**
  * Функция которая вызывается после проведения вычислений
@@ -46,12 +51,12 @@ Calculator.formula = function() {
  * Выполняет вычисления по указанной формуле и вывод результат в поле вывода, либо через alert
  */
 Calculator.exec = function() {
-    this.initFields();
-    this.checkRules();
-    this.printOutput(
-        this.formula().val().toFixed(this.fix)
+    Calculator.initFields();
+    Calculator.checkRules();
+    Calculator.printOutput(
+        Calculator.formula().val().toFixed(Calculator.fix)
     );
-    this.afterExec();
+    Calculator.afterExec();
 };
 
 /**
@@ -59,14 +64,15 @@ Calculator.exec = function() {
  * @param {Number} val
  */
 Calculator.printOutput = function(val) {
-    if (this.output === null) {
+    var output = document.getElementById(Calculator.id_output_elem);
+    if (output === null) {
         alert(val);
     }
+    else if (output.value === undefined) {
+        output.innerHTML = val;
+    }
     else {
-        if (this.output.value === undefined)
-            this.output.innerHTML = val;
-        else
-            this.output.value = val;
+        output.value = val;
     }
 };
 
@@ -75,31 +81,33 @@ Calculator.printOutput = function(val) {
  * @returns {Element}
  */
 Calculator.findMainTag = function() {
-    var all = document.body.getElementsByTagName("*");
-    for (var i = 0; i < all.length; i++) {
-        if (all[i].getAttribute("data-calc") === "MAIN") {
-            return all[i];
-        }
-    }
-    return null;
+    return document.getElementById(Calculator.id_main_elem);
 };
 
 /**
  * Инициализирует значения полей
  */
 Calculator.initFields = function() {
-    var items = this.findMainTag().getElementsByTagName("*");
+    var main_dom = Calculator.findMainTag();
+    Calculator.initFieldsForArray(
+        main_dom.getElementsByTagName("input")
+    );
+    Calculator.initFieldsForArray(
+        main_dom.getElementsByTagName("select")
+    );
+};
+
+Calculator.initFieldsForArray = function(items) {
     for (var i = 0; i < items.length; i++) {
-        var name = null;
         var elem = items[i];
-        if ((name = elem.getAttribute("data-calc")) !== null) {
-            if (name === "OUTPUT")
-                this.output = elem;
-            else
-                this.fields[name] = Number(elem.value);
+        if  (elem.name != "" && elem.id != Calculator.id_output_elem) {
+            if (isNaN(elem.value) || !elem.checked && (elem.type == 'radio' || elem.type == 'checkbox')) {
+                continue;
+            }
+            Calculator.fields[elem.name] = Number(elem.value);
         }
     }
-};
+}
 
 /**
  * Проверка правил установленных пользователем
@@ -107,7 +115,7 @@ Calculator.initFields = function() {
 Calculator.checkRules = function() {
     for (var name in this.rules) {
         var rule = this.rules[name];
-        this.fields[name] = rule(this.fields[name]);
+        Calculator.fields[name] = rule(Calculator.fields[name]);
     }
 };
 
@@ -126,13 +134,13 @@ function op(value) {
 function Operand(input_value) {
     this.parseValue = function(value) {
         // если Operand
-        if (value.val !== undefined) {
+        if (value.hasOwnProperty('val')) {
             return value.val();
         }
         // если String
         else if (isNaN(value)) {
             var tmp = Calculator.fields[value];
-            if (tmp === null) {
+            if (tmp === null || tmp === undefined) {
                 throw new Error("Input value invalid");
             }
             return tmp;
